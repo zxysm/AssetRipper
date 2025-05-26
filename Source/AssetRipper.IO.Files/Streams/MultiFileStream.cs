@@ -1,7 +1,6 @@
-using System.Diagnostics;
 using System.Text.RegularExpressions;
 
-namespace AssetRipper.IO.Files.Streams.MultiFile
+namespace AssetRipper.IO.Files.Streams
 {
 	public sealed partial class MultiFileStream : Stream
 	{
@@ -179,7 +178,7 @@ namespace AssetRipper.IO.Files.Streams.MultiFile
 				}
 			}
 
-			splitFiles = splitFiles.OrderBy(t => t, s_splitNameComparer).ToArray();
+			splitFiles = splitFiles.OrderBy(t => t, SplitNameComparer.Instance).ToArray();
 			Stream[] streams = new Stream[splitFiles.Length];
 			try
 			{
@@ -358,10 +357,7 @@ namespace AssetRipper.IO.Files.Streams.MultiFile
 			get => m_position;
 			set
 			{
-				if (value < 0)
-				{
-					throw new ArgumentOutOfRangeException(nameof(value), value, null);
-				}
+				ArgumentOutOfRangeException.ThrowIfNegative(value);
 
 				m_position = value;
 				if (value < m_currentBegin || value >= m_currentEnd)
@@ -380,8 +376,6 @@ namespace AssetRipper.IO.Files.Streams.MultiFile
 		public override bool CanRead { get; }
 		public override bool CanWrite { get; }
 		public override bool CanSeek => true;
-
-		private static readonly SplitNameComparer s_splitNameComparer = new();
 
 		/// <summary>
 		/// Always has at least one element.
